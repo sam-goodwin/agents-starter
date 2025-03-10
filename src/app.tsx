@@ -9,7 +9,7 @@ import { Card } from "./components/ui/card";
 import { Input } from "./components/ui/input";
 import { Avatar, AvatarFallback } from "./components/ui/avatar";
 import { Switch } from "./components/ui/switch";
-import { Send, Bot, Trash2, Sun, Moon, Bug } from "lucide-react";
+import { Send, Bot, Trash2, Sun, Moon, Bug, Square } from "lucide-react";
 
 // List of tools that require human confirmation
 const toolsRequiringConfirmation: (keyof typeof tools)[] = [
@@ -64,10 +64,14 @@ export default function Chat() {
     handleSubmit: handleAgentSubmit,
     addToolResult,
     clearHistory,
+    stop,
+    status
   } = useAgentChat({
     agent,
     maxSteps: 5,
   });
+
+  console.log(status); // will be stuck in ready
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -377,14 +381,26 @@ export default function Chat() {
               />
             </div>
 
-            <Button
-              type="submit"
-              size="icon"
-              className="rounded-full h-10 w-10 flex-shrink-0"
-              disabled={pendingToolCallConfirmation || !agentInput.trim()}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            {status === 'streaming' ? (
+              <Button
+                type="button"
+                size="icon"
+                variant="destructive"
+                className="rounded-full h-10 w-10 flex-shrink-0"
+                onClick={() => stop()}
+              >
+                <Square className="h-5 w-5" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="icon"
+                className="rounded-full h-10 w-10 flex-shrink-0"
+                disabled={pendingToolCallConfirmation || !agentInput.trim()}
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            )}
           </div>
         </form>
       </div>
